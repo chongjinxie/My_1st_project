@@ -1,0 +1,117 @@
+submodule ciena-ospfv3-global {
+  belongs-to ciena-ospfv3 {
+    prefix ciena;
+  }
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+  import openconfig-extensions {
+    prefix oc-ext;
+  }
+
+  organization
+    "Ciena";
+  contact
+    "Ciena
+     www.ciena.com";
+  description
+    "This submodule provides OSPFv3 configuration and operational
+     state parameters that are global to a particular OSPF instance";
+  oc-ext:openconfig-version "0.0.1";
+
+  revision 2018-08-07 {
+    description
+      "Initial revision";
+    reference "0.0.1";
+  }
+
+  grouping ospfv3-global-config {
+    description
+      "Global configuration for OSPFv3";
+    leaf router-id {
+      type yang:dotted-quad;
+      description
+        "A 32-bit number represented as a dotted quad assigned to
+         each router running the OSPFv3 protocol. This number should
+         be unique within the autonomous system";
+      reference "rfc2828";
+    }
+    leaf log-adjacency-changes {
+      type boolean;
+      description
+        "When this leaf is set to true, a log message will be
+         generated when the state of an OSPFv3 neighbour changes.";
+    }
+    leaf hide-transit-only-networks {
+      type boolean;
+      description
+        "When this leaf is set to true, do not advertise prefixes
+         into OSPFv3 that correspond to transit interfaces, as per
+         the behaviour discussed in RFC6860.";
+      reference "RFC6860 - Hiding Transit-Only Networks in OSPF";
+    }
+  }
+
+  grouping ospfv3-global-graceful-restart-config {
+    description
+      "Configuration parameters relating to graceful restart for
+       OSPFv3";
+    leaf enabled {
+      type boolean;
+      description
+        "When the value of this leaf is set to true, graceful restart
+         is enabled on the local system. In this case, the system will
+         use Grace-LSAs to signal that it is restarting to its
+         neighbors.";
+    }
+    leaf helper-only {
+      type boolean;
+      description
+        "Operate graceful-restart only in helper mode. When this leaf
+         is set to true, the local system does not use Grace-LSAs to
+         indicate that it is restarting, but will accept Grace-LSAs
+         from remote systems, and suppress withdrawl of adjacencies
+         of the system for the grace period specified";
+    }
+  }
+
+  grouping ospfv3-global-structural {
+    description
+      "Top level structural grouping for OSPFv3 global parameters";
+    container global {
+      description
+        "Configuration and operational state parameters for settings
+         that are global to the OSPFv3 instance";
+      container config {
+        description
+          "Global configuration parameters for OSPFv3";
+        uses ospfv3-global-config;
+      }
+      container state {
+        config false;
+        description
+          "Operational state parameters for OSPFv3";
+        uses ospfv3-global-config;
+      }
+      container graceful-restart {
+        description
+          "Configuration and operational state parameters for OSPFv3
+           graceful restart";
+        container config {
+          description
+            "Configuration parameters relating to OSPFv3 graceful
+             restart";
+          uses ospfv3-global-graceful-restart-config;
+        }
+        container state {
+          config false;
+          description
+            "Operational state parameters relating to OSPFv3 graceful
+             restart";
+          uses ospfv3-global-graceful-restart-config;
+        }
+      }
+    }
+  }
+}
